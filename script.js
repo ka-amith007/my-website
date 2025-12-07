@@ -34,12 +34,12 @@ class PortfolioAnimations {
 
         const ctx = canvas.getContext('2d');
         let particles = [];
-        
+
         const resizeCanvas = () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         };
-        
+
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
@@ -78,7 +78,7 @@ class PortfolioAnimations {
 
         const animate = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
+
             particles.forEach(particle => {
                 particle.update();
                 particle.draw();
@@ -112,7 +112,7 @@ class PortfolioAnimations {
     setupCustomCursor() {
         const cursor = document.querySelector('.cursor');
         const cursorFollower = document.querySelector('.cursor-follower');
-        
+
         if (!cursor || !cursorFollower) return;
 
         let mouseX = 0, mouseY = 0;
@@ -121,7 +121,7 @@ class PortfolioAnimations {
         document.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
             mouseY = e.clientY;
-            
+
             cursor.style.left = mouseX + 'px';
             cursor.style.top = mouseY + 'px';
         });
@@ -130,23 +130,23 @@ class PortfolioAnimations {
         const animateCursor = () => {
             followerX += (mouseX - followerX) * 0.1;
             followerY += (mouseY - followerY) * 0.1;
-            
+
             cursorFollower.style.left = followerX + 'px';
             cursorFollower.style.top = followerY + 'px';
-            
+
             requestAnimationFrame(animateCursor);
         };
         animateCursor();
 
         // Hover effects
         const hoverElements = document.querySelectorAll('a, button, .project-card, .service-card, .skill-item');
-        
+
         hoverElements.forEach(el => {
             el.addEventListener('mouseenter', () => {
                 cursor.style.transform = 'scale(1.5)';
                 cursor.style.backgroundColor = 'rgba(0, 255, 255, 0.2)';
             });
-            
+
             el.addEventListener('mouseleave', () => {
                 cursor.style.transform = 'scale(1)';
                 cursor.style.backgroundColor = 'transparent';
@@ -157,21 +157,46 @@ class PortfolioAnimations {
     // Mobile Navigation
     setupMobileNav() {
         const hamburger = document.querySelector('.hamburger');
-        const navMenu = document.querySelector('.nav-menu');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const body = document.body;
 
-        if (!hamburger || !navMenu) return;
+        if (!hamburger || !mobileMenu) return;
 
+        // Toggle mobile menu
         hamburger.addEventListener('click', () => {
             hamburger.classList.toggle('active');
-            navMenu.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+
+            // Update aria-expanded
+            const isExpanded = hamburger.classList.contains('active');
+            hamburger.setAttribute('aria-expanded', isExpanded);
+
+            // Prevent body scroll when menu is open
+            if (isExpanded) {
+                body.style.overflow = 'hidden';
+            } else {
+                body.style.overflow = '';
+            }
         });
 
-        // Close menu when clicking on a link
-        document.querySelectorAll('.nav-link').forEach(link => {
+        // Close menu when clicking on a mobile link
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
             link.addEventListener('click', () => {
                 hamburger.classList.remove('active');
-                navMenu.classList.remove('active');
+                mobileMenu.classList.remove('active');
+                hamburger.setAttribute('aria-expanded', 'false');
+                body.style.overflow = '';
             });
+        });
+
+        // Close menu on window resize if open
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768 && mobileMenu.classList.contains('active')) {
+                hamburger.classList.remove('active');
+                mobileMenu.classList.remove('active');
+                hamburger.setAttribute('aria-expanded', 'false');
+                body.style.overflow = '';
+            }
         });
     }
 
@@ -183,7 +208,7 @@ class PortfolioAnimations {
         const texts = [
             'CS Engineering Student',
             'Web Developer',
-            'AI Enthusiast', 
+            'AI Enthusiast',
             'Problem Solver',
             'Tech Innovator'
         ];
@@ -194,7 +219,7 @@ class PortfolioAnimations {
 
         const typeWriter = () => {
             const currentText = texts[textIndex];
-            
+
             if (isDeleting) {
                 typingElement.textContent = currentText.substring(0, charIndex - 1);
                 charIndex--;
@@ -227,16 +252,16 @@ class PortfolioAnimations {
                 if (entry.isIntersecting) {
                     entry.target.style.opacity = '1';
                     entry.target.style.transform = 'translateY(0)';
-                    
+
                     // Special animations for different elements
                     if (entry.target.classList.contains('project-card')) {
                         entry.target.style.animation = 'slideInUp 0.6s ease-out forwards';
                     }
-                    
+
                     if (entry.target.classList.contains('skill-category')) {
                         entry.target.style.animation = 'slideInUp 0.8s ease-out forwards';
                     }
-                    
+
                     observer.unobserve(entry.target);
                 }
             });
@@ -268,17 +293,17 @@ class PortfolioAnimations {
     // Animated Skill Bars
     setupSkillBars() {
         const skillBars = document.querySelectorAll('.skill-progress');
-        
+
         const animateSkillBars = (entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const skillBar = entry.target;
                     const percent = skillBar.dataset.percent;
-                    
+
                     setTimeout(() => {
                         skillBar.style.width = percent + '%';
                     }, 300);
-                    
+
                     observer.unobserve(entry.target);
                 }
             });
@@ -299,13 +324,13 @@ class PortfolioAnimations {
         if (!form) return;
 
         const inputs = form.querySelectorAll('input, textarea');
-        
+
         // Add focus/blur animations
         inputs.forEach(input => {
             input.addEventListener('focus', () => {
                 input.parentElement.classList.add('focused');
             });
-            
+
             input.addEventListener('blur', () => {
                 if (!input.value) {
                     input.parentElement.classList.remove('focused');
@@ -320,10 +345,10 @@ class PortfolioAnimations {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
-                
+
                 if (target) {
                     const offsetTop = target.offsetTop - 80; // Account for fixed navbar
-                    
+
                     window.scrollTo({
                         top: offsetTop,
                         behavior: 'smooth'
@@ -338,13 +363,13 @@ class PortfolioAnimations {
         window.addEventListener('scroll', () => {
             const scrolled = window.pageYOffset;
             const rate = scrolled * -0.5;
-            
+
             // Parallax for hero background
             const heroGrid = document.querySelector('.hero-grid');
             if (heroGrid) {
                 heroGrid.style.transform = `translateY(${rate}px)`;
             }
-            
+
             // Floating elements rotation
             const floatingElements = document.querySelectorAll('.float-item');
             floatingElements.forEach((el, index) => {
@@ -358,12 +383,12 @@ class PortfolioAnimations {
     setupGlowEffects() {
         // Add glow effect on hover for interactive elements
         const glowElements = document.querySelectorAll('.btn, .social-link, .project-card, .service-card');
-        
+
         glowElements.forEach(el => {
             el.addEventListener('mouseenter', () => {
                 el.style.filter = 'drop-shadow(0 0 20px rgba(0, 255, 255, 0.4))';
             });
-            
+
             el.addEventListener('mouseleave', () => {
                 el.style.filter = '';
             });
@@ -390,7 +415,7 @@ class PortfolioAnimations {
 
         window.addEventListener('scroll', () => {
             let current = '';
-            
+
             sections.forEach(section => {
                 const sectionTop = section.offsetTop - 150;
                 if (window.scrollY >= sectionTop) {
@@ -415,10 +440,10 @@ class ParticleSystem {
         this.ctx = this.canvas.getContext('2d');
         this.particles = [];
         this.mouse = { x: 0, y: 0 };
-        
+
         this.init();
     }
-    
+
     createCanvas() {
         const canvas = document.createElement('canvas');
         canvas.style.position = 'fixed';
@@ -429,28 +454,28 @@ class ParticleSystem {
         canvas.style.pointerEvents = 'none';
         canvas.style.zIndex = '-1';
         canvas.style.opacity = '0.3';
-        
+
         document.body.appendChild(canvas);
         return canvas;
     }
-    
+
     init() {
         this.resizeCanvas();
         this.createParticles();
         this.animate();
-        
+
         window.addEventListener('resize', () => this.resizeCanvas());
         document.addEventListener('mousemove', (e) => {
             this.mouse.x = e.clientX;
             this.mouse.y = e.clientY;
         });
     }
-    
+
     resizeCanvas() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
     }
-    
+
     createParticles() {
         const particleCount = 50;
         for (let i = 0; i < particleCount; i++) {
@@ -464,36 +489,36 @@ class ParticleSystem {
             });
         }
     }
-    
+
     animate() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
+
         this.particles.forEach(particle => {
             // Update position
             particle.x += particle.vx;
             particle.y += particle.vy;
-            
+
             // Bounce off walls
             if (particle.x < 0 || particle.x > this.canvas.width) particle.vx *= -1;
             if (particle.y < 0 || particle.y > this.canvas.height) particle.vy *= -1;
-            
+
             // Mouse interaction
             const dx = this.mouse.x - particle.x;
             const dy = this.mouse.y - particle.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-            
+
             if (distance < 100) {
                 particle.x -= dx * 0.01;
                 particle.y -= dy * 0.01;
             }
-            
+
             // Draw particle
             this.ctx.beginPath();
             this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
             this.ctx.fillStyle = `rgba(0, 255, 255, ${particle.opacity})`;
             this.ctx.fill();
         });
-        
+
         requestAnimationFrame(() => this.animate());
     }
 }
@@ -503,7 +528,7 @@ class LoadingAnimation {
     constructor() {
         this.createLoader();
     }
-    
+
     createLoader() {
         const loader = document.createElement('div');
         loader.className = 'page-loader';
@@ -515,7 +540,7 @@ class LoadingAnimation {
                 <h3>Loading...</h3>
             </div>
         `;
-        
+
         const style = document.createElement('style');
         style.textContent = `
             .page-loader {
@@ -566,10 +591,10 @@ class LoadingAnimation {
                 font-weight: 500;
             }
         `;
-        
+
         document.head.appendChild(style);
         document.body.appendChild(loader);
-        
+
         // Remove loader after content loads
         window.addEventListener('load', () => {
             setTimeout(() => {
@@ -586,13 +611,13 @@ class LoadingAnimation {
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize loading animation
     new LoadingAnimation();
-    
+
     // Initialize portfolio animations
     new PortfolioAnimations();
-    
+
     // Initialize particle system
     new ParticleSystem();
-    
+
     // Add CSS animations
     const animationStyles = document.createElement('style');
     animationStyles.textContent = `
@@ -636,7 +661,7 @@ document.addEventListener('DOMContentLoaded', () => {
             transform: rotate(45deg) translate(-5px, -6px);
         }
     `;
-    
+
     document.head.appendChild(animationStyles);
 });
 
@@ -644,7 +669,7 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
     // Lazy load images when they come into viewport
     const lazyImages = document.querySelectorAll('img[data-src]');
-    
+
     if ('IntersectionObserver' in window) {
         const imageObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -656,7 +681,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
-        
+
         lazyImages.forEach(img => imageObserver.observe(img));
     }
 });
@@ -665,18 +690,18 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
     let konamiCode = [];
     const konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65]; // Up Up Down Down Left Right Left Right B A
-    
+
     document.addEventListener('keydown', (e) => {
         konamiCode.push(e.keyCode);
-        
+
         if (konamiCode.length > konami.length) {
             konamiCode.shift();
         }
-        
+
         if (konamiCode.join(',') === konami.join(',')) {
             // Activate party mode!
             document.body.style.animation = 'rainbow 2s linear infinite';
-            
+
             const style = document.createElement('style');
             style.textContent = `
                 @keyframes rainbow {
@@ -685,19 +710,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             `;
             document.head.appendChild(style);
-            
+
             setTimeout(() => {
                 document.body.style.animation = '';
                 style.remove();
             }, 5000);
-            
+
             konamiCode = [];
         }
     });
 
     // CV Download Analytics
     setupCVDownload();
-    
+
     // Social Links Analytics
     setupSocialTracking();
 });
@@ -707,12 +732,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // CV Download Tracking
 function setupCVDownload() {
     const cvLinks = document.querySelectorAll('a[href*="Resume"]');
-    
+
     cvLinks.forEach(link => {
         link.addEventListener('click', () => {
             // Track download
             console.log('CV Downloaded');
-            
+
             // Google Analytics tracking (if you have GA setup)
             if (typeof gtag !== 'undefined') {
                 gtag('event', 'download', {
@@ -720,7 +745,7 @@ function setupCVDownload() {
                     'event_label': 'Resume PDF'
                 });
             }
-            
+
             // Show thank you message
             showNotification('Thank you for downloading my CV!', 'success');
         });
@@ -730,15 +755,15 @@ function setupCVDownload() {
 // Social Links Tracking
 function setupSocialTracking() {
     const socialLinks = document.querySelectorAll('.social-link, .contact-method');
-    
+
     socialLinks.forEach(link => {
         link.addEventListener('click', () => {
-            const platform = link.querySelector('i').className.includes('github') ? 'GitHub' : 
-                           link.querySelector('i').className.includes('linkedin') ? 'LinkedIn' : 
-                           link.querySelector('i').className.includes('envelope') ? 'Email' : 'Unknown';
-            
+            const platform = link.querySelector('i').className.includes('github') ? 'GitHub' :
+                link.querySelector('i').className.includes('linkedin') ? 'LinkedIn' :
+                    link.querySelector('i').className.includes('envelope') ? 'Email' : 'Unknown';
+
             console.log(`${platform} link clicked`);
-            
+
             // Track social media clicks
             if (typeof gtag !== 'undefined') {
                 gtag('event', 'social_click', {
@@ -755,22 +780,22 @@ function showNotification(message, type = 'info') {
     // Remove existing notifications
     const existing = document.querySelector('.notification');
     if (existing) existing.remove();
-    
+
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
         <div class="notification-content">
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : 
-                           type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+            <i class="fas ${type === 'success' ? 'fa-check-circle' :
+            type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
             <span>${message}</span>
         </div>
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     // Animate in
     setTimeout(() => notification.classList.add('show'), 100);
-    
+
     // Auto remove
     setTimeout(() => {
         notification.classList.remove('show');
@@ -855,34 +880,34 @@ class ProjectLinkManager {
                 code: 'https://github.com/ka-amith007/Sign-Language-to-Text-Converter'
             }
         };
-        
+
         this.setupProjectLinks();
     }
-    
+
     // Update a specific project's links
     updateProjectLinks(projectName, demoUrl, codeUrl) {
         if (this.projectLinks[projectName]) {
             this.projectLinks[projectName].demo = demoUrl || '#';
             this.projectLinks[projectName].code = codeUrl || '#';
-            
+
             // Update the actual links in the DOM
             const demoLink = document.querySelector(`a[data-project="${projectName}"][data-type="demo"]`);
             const codeLink = document.querySelector(`a[data-project="${projectName}"][data-type="code"]`);
-            
+
             if (demoLink) {
                 demoLink.href = demoUrl || '#';
                 demoLink.title = demoUrl ? 'Live Demo' : 'Live Demo - Coming Soon';
             }
-            
+
             if (codeLink) {
                 codeLink.href = codeUrl || '#';
                 codeLink.title = codeUrl ? 'View Code' : 'View Code - Coming Soon';
             }
-            
+
             console.log(`Updated ${projectName}:`, { demo: demoUrl, code: codeUrl });
         }
     }
-    
+
     // Setup click handlers for project links
     setupProjectLinks() {
         document.querySelectorAll('.project-link').forEach(link => {
@@ -894,7 +919,7 @@ class ProjectLinkManager {
             });
         });
     }
-    
+
     // Batch update multiple projects
     updateMultipleProjects(updates) {
         Object.entries(updates).forEach(([projectName, urls]) => {
